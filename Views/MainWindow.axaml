@@ -1,0 +1,666 @@
+﻿<Window xmlns="https://github.com/avaloniaui"
+		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+		xmlns:vm="using:VACalcApp.ViewModels"
+		xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		mc:Ignorable="d"
+		x:Class="VACalcApp.Views.MainWindow"
+		x:DataType="vm:MainWindowViewModel"
+		Icon="/Assets/vacalc-logo.ico"
+		Title="{StaticResource AppTitle}"
+		Width="630" Height="530"
+		CanResize="false"
+		Background="#FAFAFA"
+		FontFamily="Segoe UI, Arial"
+		WindowStartupLocation="CenterScreen">
+
+
+	<Grid Margin="12,5,12,5">
+		<Grid.RowDefinitions>
+			<!-- Панель заголовка -->
+			<RowDefinition Height="Auto"/>
+			<!-- Основное содержимое (Tabs)-->
+			<RowDefinition Height="*"/>
+			<!-- Панель статуса (TO-DO) -->
+			<RowDefinition Height="Auto"/>
+		</Grid.RowDefinitions>
+
+		<!-- Панель заголовка приложения -->
+		<Border Grid.Row="0"
+				Background="#4BB462"
+				CornerRadius="6"
+				Padding="18,12"
+				Margin="0,0,0,12">
+
+			<TextBlock Text="Калькулятор суммы дохода"
+					   FontSize="20"
+					   FontWeight="SemiBold"
+					   Foreground="White"
+					   HorizontalAlignment="Center"/>
+		</Border>
+
+		<!-- Основной контейнер с вкладками -->
+		<TabControl Grid.Row="1"
+					BorderThickness="1"
+					Background="#FFFFFF"
+					Padding="0"
+					CornerRadius="6"
+					Margin="0,0,0,12">
+
+			<!-- ВКЛАДКА 1: РАСЧЕТ -->
+			<TabItem Header="Расчет">
+				<Grid>
+					<Grid.RowDefinitions>
+						<!-- Секция 1: Счет и вид начисления-->
+						<RowDefinition Height="Auto"/>
+						<!-- Секция 2: Период и расчет -->
+						<RowDefinition Height="*"/>
+						<!-- Секция 3: Кнопки действий -->
+						<RowDefinition Height="Auto"/>
+					</Grid.RowDefinitions>
+
+					<!-- Панель параметров вклада и вида начисления -->
+					<Grid Grid.Row="0" Margin="0,0,0,12">
+						<Grid.ColumnDefinitions>
+							<!-- Панель данных счета -->
+							<ColumnDefinition Width="*"/>
+							<!-- Отступ между панелями -->
+							<ColumnDefinition Width="8"/>
+							<!-- Панель типа расчета -->
+							<ColumnDefinition Width="*"/>
+						</Grid.ColumnDefinitions>
+
+						<!-- Панель данных по вкладу -->
+						<Border Grid.Column="0"
+								Background="White"
+								CornerRadius="6"
+								BorderBrush="#E0E0E0"
+								BorderThickness="1"
+								Padding="0"
+								BoxShadow="0 1 3 0 #1E88E520">
+							<StackPanel>
+								<!-- Заголовок панели -->
+								<Border Background="#F5F5F5"
+										CornerRadius="6,6,0,0"
+										Padding="12,8"
+										BorderThickness="0,0,0,1"
+										BorderBrush="#E0E0E0">
+									<TextBlock Text="Вклад"
+											   FontSize="13"
+											   FontWeight="SemiBold"
+											   Foreground="#414042"/>
+								</Border>
+
+								<!-- Поля ввода данных вклада -->
+								<Grid Margin="12">
+									<Grid.RowDefinitions>
+										<RowDefinition Height="Auto"/>
+										<RowDefinition Height="Auto"/>
+										<RowDefinition Height="Auto"/>
+									</Grid.RowDefinitions>
+
+									<!-- Сумма депозита -->
+									<Grid Grid.Row="0" Margin="0,0,0,8">
+										<Grid.ColumnDefinitions>
+											<ColumnDefinition Width="Auto"/>
+											<ColumnDefinition Width="*"/>
+										</Grid.ColumnDefinitions>
+
+										<TextBlock Grid.Column="0"
+												   Text="Сумма:"
+												   VerticalAlignment="Center"
+												   Margin="0,0,8,0"
+												   Width="100"/>
+										<NumericUpDown Grid.Column="1"
+													   Value="{Binding DepositAmount,
+													   FallbackValue = 0}"
+													   FormatString="C2"
+													   ParsingNumberStyle="Currency"
+													   Minimum="1000"
+													   Maximum="10000000"
+													   ShowButtonSpinner="False"
+													   Watermark="Введите сумму"
+													   FontSize="13"/>
+
+									</Grid>
+
+									<!-- Процентная ставка -->
+									<Grid Grid.Row="1" Margin="0,0,0,8">
+										<Grid.ColumnDefinitions>
+											<ColumnDefinition Width="Auto"/>
+											<ColumnDefinition Width="*"/>
+										</Grid.ColumnDefinitions>
+
+										<TextBlock Grid.Column="0"
+												   Text="Ставка:"
+												   VerticalAlignment="Center"
+												   Margin="0,0,8,0"
+												   Width="100"/>
+										<MaskedTextBox Grid.Column="1"
+													   Text="{Binding DepositInterestRate,
+													   Converter={StaticResource PercentageConverter}}"
+													   Mask="##.## %"
+													   PromptChar="0"
+													   HidePromptOnLeave="True"
+													   FontSize="13"/>
+									</Grid>
+
+									<!-- Выбор банка -->
+									<Grid Grid.Row="2">
+										<Grid.ColumnDefinitions>
+											<ColumnDefinition Width="Auto"/>
+											<ColumnDefinition Width="*"/>
+										</Grid.ColumnDefinitions>
+
+										<TextBlock Grid.Column="0"
+												   Text="Банк:"
+												   VerticalAlignment="Center"
+												   Margin="0,0,8,0"
+												   Width="100"/>
+										<ComboBox Grid.Column="1"
+												  ItemsSource="{Binding Banks}"
+												  SelectedItem="{Binding SelectedBank}"
+
+												  PlaceholderText="Выберите банк"
+												  HorizontalAlignment="Stretch"
+												  VerticalAlignment="Center"
+												  FontSize="13"/>
+									</Grid>
+								</Grid>
+							</StackPanel>
+						</Border>
+
+						<!-- Панель вида начисления процентов -->
+						<Border Grid.Column="2"
+								Background="White"
+								CornerRadius="6"
+								BorderBrush="#E0E0E0"
+								BorderThickness="1"
+								Padding="0"
+								BoxShadow="0 1 3 0 #1E88E520">
+							<StackPanel>
+								<!-- Заголовок панели -->
+								<Border Background="#F5F5F5"
+										CornerRadius="6,6,0,0"
+										Padding="12,8"
+										BorderThickness="0,0,0,1"
+										BorderBrush="#E0E0E0">
+									<TextBlock Text="Вид начисления"
+											   FontSize="13"
+											   FontWeight="SemiBold"
+											   Foreground="#414042"/>
+								</Border>
+
+								<!-- Радиокнопки выбора типа расчета -->
+								<StackPanel Orientation="Vertical" Spacing="6" Margin="12">
+									<RadioButton Content="Простые проценты"
+												 ToolTip.Tip="Простые проценты с выплатой в конце срока"
+												 GroupName="CalculationMethod"
+												 IsChecked="{Binding CalculationMethod, Converter={StaticResource InterestCalculationMethodToBoolConverter},ConverterParameter=0}"
+												 FontSize="13"/>
+									<RadioButton Content="Ежемесячная капитализация"
+												 ToolTip.Tip="Ежемесячная капитализация с выплатой в конце срока"
+												 GroupName="CalculationMethod"
+												 IsChecked="{Binding CalculationMethod, Converter={StaticResource InterestCalculationMethodToBoolConverter},ConverterParameter=1}"
+												 FontSize="13"/>
+									<RadioButton Content="Накопительный счет"
+												 ToolTip.Tip="Накопительный счет на ежемесячный минимальный остаток"
+												 GroupName="CalculationMethod"
+												 IsChecked="{Binding CalculationMethod, Converter={StaticResource InterestCalculationMethodToBoolConverter},ConverterParameter=2}"
+												 FontSize="13"/>
+								</StackPanel>
+							</StackPanel>
+						</Border>
+					</Grid>
+
+					<!-- Панель периода и результатов расчета -->
+					<Grid Grid.Row="1" Margin="0,0,0,12">
+						<Grid.ColumnDefinitions>
+							<!-- Панель параметров периода -->
+							<ColumnDefinition Width="*"/>
+							<!-- Отступ между панелями -->
+							<ColumnDefinition Width="8"/>
+							<!-- Панель результатов расчета -->
+							<ColumnDefinition Width="*"/>
+						</Grid.ColumnDefinitions>
+
+						<!-- Панель параметров периода -->
+						<Border Grid.Column="0"
+								Background="White"
+								CornerRadius="6"
+								BorderBrush="#E0E0E0"
+								BorderThickness="1"
+								Padding="0"
+								BoxShadow="0 1 3 0 #1E88E520">
+							<Grid>
+								<Grid.RowDefinitions>
+									<RowDefinition Height="Auto"/>
+									<RowDefinition Height="*"/>
+								</Grid.RowDefinitions>
+
+								<!-- Заголовок панели -->
+								<Border Grid.Row="0"
+										Background="#F5F5F5"
+										CornerRadius="6,6,0,0"
+										Padding="12,8"
+										BorderThickness="0,0,0,1"
+										BorderBrush="#E0E0E0">
+									<TextBlock Text="Период"
+											   FontSize="13"
+											   FontWeight="SemiBold"
+											   Foreground="#414042"/>
+								</Border>
+
+								<!-- Поля ввода параметров периода -->
+								<Grid Grid.Row="1" Margin="12">
+									<Grid.RowDefinitions>
+										<RowDefinition Height="Auto"/>
+										<RowDefinition Height="Auto"/>
+										<RowDefinition Height="Auto"/>
+										<RowDefinition Height="Auto"/>
+										<RowDefinition Height="*"/>
+									</Grid.RowDefinitions>
+
+									<!-- Дата начала периода -->
+									<Grid Grid.Row="0" Margin="0,0,0,8">
+										<Grid.ColumnDefinitions>
+											<ColumnDefinition Width="Auto"/>
+											<ColumnDefinition Width="*"/>
+										</Grid.ColumnDefinitions>
+
+										<TextBlock Grid.Column="0"
+												   Text="Дата начала:"
+												   VerticalAlignment="Center"
+												   Margin="0,0,0,0"
+												   Width="110"/>
+										<CalendarDatePicker Grid.Column="1"
+															SelectedDate="{Binding PeriodStartDate}"														
+															VerticalAlignment="Center"
+															HorizontalAlignment="Stretch"
+															FontSize="13"/>
+									</Grid>
+
+									<!-- Количество месяцев -->
+									<Grid Grid.Row="1" Margin="0,0,0,8">
+										<Grid.ColumnDefinitions>
+											<ColumnDefinition Width="Auto"/>
+											<ColumnDefinition Width="*"/>
+										</Grid.ColumnDefinitions>
+
+										<TextBlock Grid.Column="0"
+												   Text="Месяцев:"
+												   VerticalAlignment="Center"
+												   Margin="0,0,0,0"
+												   Width="110"/>
+										<NumericUpDown Grid.Column="1"
+													   Value="{Binding DurationMonths,
+													   FallbackValue=1}"
+													   IsEnabled="{Binding IsChangeDurationDaysEnabled}"
+													   Minimum="1"
+													   Maximum="120"
+													   Increment="1"
+													   ParsingNumberStyle ="Integer"
+													   VerticalAlignment="Center"
+													   Watermark="Введите значение"
+													   FontSize="13"/>
+									</Grid>
+
+									<!-- Рассчитанное количество дней (только чтение) -->
+									<Grid Grid.Row="2" Margin="0,0,0,8">
+										<Grid.ColumnDefinitions>
+											<ColumnDefinition Width="Auto"/>
+											<ColumnDefinition Width="*"/>
+										</Grid.ColumnDefinitions>
+
+										<TextBlock Grid.Column="0"
+												   Text="Дней:"
+												   VerticalAlignment="Center"
+												   Margin="0,0,0,0"
+												   Width="110"/>
+										<TextBox Grid.Column="1"
+												 Text="{Binding DurationDays, Mode=OneWay}"
+												 IsReadOnly="True"
+												 MaxLength="4"
+												 Foreground="#414042"
+												 FontWeight="SemiBold"
+												 VerticalAlignment="Center"
+												 FontSize="13"/>
+									</Grid>
+
+									<!-- Дата окончания (рассчитывается автоматически) -->
+									<Grid Grid.Row="3">
+										<Grid.ColumnDefinitions>
+											<ColumnDefinition Width="Auto"/>
+											<ColumnDefinition Width="*"/>
+										</Grid.ColumnDefinitions>
+
+										<TextBlock Grid.Column="0"
+												   Text="Закрытие:"
+												   VerticalAlignment="Center"
+												   Margin="0,0,0,0"
+												   Width="110"/>
+										<CalendarDatePicker Grid.Column="1"
+															SelectedDate="{Binding PeriodEndDate, Mode=OneWay}"
+															IsEnabled="False"
+															VerticalAlignment="Center"
+															HorizontalAlignment="Stretch"
+															FontWeight="SemiBold"
+															FontSize="13"/>
+									</Grid>
+
+									<!-- Пустое пространство для выравнивания -->
+									<Border Grid.Row="4" Background="Transparent"/>
+								</Grid>
+							</Grid>
+						</Border>
+
+						<!-- Панель результатов расчета -->
+						<Border Grid.Column="2"
+								Background="White"
+								CornerRadius="6"
+								BorderBrush="#E0E0E0"
+								BorderThickness="1"
+								Padding="0"
+								BoxShadow="0 1 3 0 #1E88E520">
+							<Grid>
+								<Grid.RowDefinitions>
+									<RowDefinition Height="Auto"/>
+									<RowDefinition Height="*"/>
+								</Grid.RowDefinitions>
+
+								<!-- Заголовок панели -->
+								<Border Grid.Row="0"
+										Background="#F5F5F5"
+										CornerRadius="6,6,0,0"
+										Padding="12,8"
+										BorderThickness="0,0,0,1"
+										BorderBrush="#E0E0E0">
+									<TextBlock Text="Расчет"
+											   FontSize="13"
+											   FontWeight="SemiBold"
+											   Foreground="#414042"/>
+								</Border>
+
+								<!-- Результаты и комментарии -->
+								<Grid Grid.Row="1" Margin="12">
+									<Grid.RowDefinitions>
+										<RowDefinition Height="Auto"/>
+										<RowDefinition Height="Auto"/>
+										<RowDefinition Height="Auto"/>
+										<RowDefinition Height="*"/>
+									</Grid.RowDefinitions>
+
+									<!-- Сумма дохода (результат расчета) -->
+									<Grid Grid.Row="0" Margin="0,0,0,12">
+										<Grid.ColumnDefinitions>
+											<ColumnDefinition Width="Auto"/>
+											<ColumnDefinition Width="*"/>
+										</Grid.ColumnDefinitions>
+
+										<TextBlock Grid.Column="0"
+												   Text="Сумма дохода:"
+												   VerticalAlignment="Center"
+												   Margin="0,0,8,0"
+												   Width="100"/>
+										<StackPanel Grid.Column="1" Margin="0,5,0,5">
+											<TextBlock Text="{Binding CalculatedIncome,
+											Converter={StaticResource IncomeAmountConverter},
+											Mode=OneWay}"
+											FontSize="14"
+											FontWeight="Bold"
+											HorizontalAlignment="Center"
+											VerticalAlignment="Center"/>
+											<Border  BorderBrush="Gray" BorderThickness="1" >
+											</Border>
+										</StackPanel>
+
+									</Grid>
+
+									<!-- Поле для комментария -->
+									<Grid Grid.Row="1">
+										<Grid.ColumnDefinitions>
+											<ColumnDefinition Width="Auto"/>
+											<ColumnDefinition Width="*"/>
+										</Grid.ColumnDefinitions>
+
+										<TextBlock Grid.Column="0"
+												   Text="Комментарий:"
+												   VerticalAlignment="Top"
+												   Margin="0,0,8,0"
+												   Width="100"/>
+
+										<TextBox Grid.Column="1"
+												 Text="{Binding Comment}"
+												 Watermark="Введите комментарий"
+												 FontSize="13"
+												 AcceptsReturn="True"
+												 TextWrapping="Wrap"
+												 VerticalAlignment="Stretch"
+												 HorizontalAlignment="Stretch"
+												 MaxHeight="50"
+												 MinHeight="50"/>
+									</Grid>
+
+
+									<!-- Отображение статуса -->
+									<StackPanel Grid.Row="2" Orientation="Horizontal"
+												HorizontalAlignment="Left"
+												VerticalAlignment="Center"
+												Margin="0,20,0,0"
+												Spacing="5">
+
+										<!-- Иконка статуса -->
+										<Image
+										Width="20"
+										Height="20"
+										Source="/Assets/info.png"
+										VerticalAlignment="Center"/>
+
+										<!-- Текст статуса -->
+										<TextBlock FontSize="13"
+												   FontWeight="SemiBold"
+												   TextTrimming="CharacterEllipsis"
+												   Width="250"
+												   HorizontalAlignment="Stretch"
+												   VerticalAlignment="Center" >
+
+											<Run Text="{Binding StatusTitle}"/>          <!-- Заголовок статуса -->
+											<Run Foreground="#7F8C8D"
+												 FontWeight="Normal"
+												 Text="{Binding StatusDescription}"/>   <!-- Описание статуса -->
+
+										</TextBlock>
+
+									</StackPanel>
+
+
+									<!-- Пустое пространство для выравнивания -->
+									<Border Grid.Row="3" Background="Transparent"/>
+
+								</Grid>
+							</Grid>
+						</Border>
+					</Grid>
+
+					<!-- Панель кнопок действий -->
+					<Grid Grid.Row="2" Margin="0">
+						<Grid.ColumnDefinitions>
+							<!-- Левая панель: вспомогательные кнопки -->
+							<ColumnDefinition Width="*"/>
+							<!-- Правая панель: основные кнопки -->
+							<ColumnDefinition Width="Auto"/>
+						</Grid.ColumnDefinitions>
+
+						<!-- Панель вспомогательных кнопок (слева) -->
+						<StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8" HorizontalAlignment="Left">
+							<Button Content="Сведения"
+									Command="{Binding ShowAboutCommand}"
+									Margin="15,0,25,0"
+									Width="95"
+									BorderBrush="Transparent"
+									BorderThickness="0"
+									CornerRadius="4"
+									HorizontalContentAlignment="Center"
+									Background="#86948C"
+									Foreground="White"/>
+						</StackPanel>
+
+						<!-- Панель основных кнопок (справа) -->
+						<StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8"
+									Margin="0,0,0,5"
+									HorizontalAlignment="Right">
+							<Button Content="Рассчитать"
+									Command="{Binding CalculateCommand}"
+									FontWeight="SemiBold"
+									HorizontalContentAlignment="Center"
+									Margin="0,0,10,0"
+									Width="95"
+									BorderBrush="Transparent"
+									BorderThickness="0"
+									CornerRadius="4"
+									Background="#00CF91"
+									Foreground="White"/>
+
+							<Button Content="Выход"
+									Command="{Binding ExitAppCommand}"
+									Margin="0,0,15,0"
+									Width="95"
+									BorderBrush="Transparent"
+									BorderThickness="0"
+									CornerRadius="4"
+									HorizontalContentAlignment="Center"
+									VerticalAlignment="Center"
+									Background="#58595B"
+									Foreground="White"/>   <!-- Серый (нейтральное действие) -->
+						</StackPanel>
+					</Grid>
+				</Grid>
+			</TabItem>
+
+			<!-- ВКЛАДКА 2: ЖУРНАЛ РАСЧЕТА -->
+			<TabItem Header="Журнал">
+				<Grid>
+					<Grid.RowDefinitions>
+						<!-- Основная панель: таблица журнала -->
+						<RowDefinition Height="*"/>
+						<!-- Панель кнопок управления журналом -->
+						<RowDefinition Height="Auto"/>
+					</Grid.RowDefinitions>
+
+					<!-- Панель журнала расчета -->
+					<Border Grid.Row="0"
+							Background="White"
+							CornerRadius="6"
+							BorderBrush="#E0E0E0"
+							BorderThickness="1"
+							Padding="0"
+							BoxShadow="0 1 3 0 #1E88E520">
+						<Grid>
+							<Grid.RowDefinitions>
+								<RowDefinition Height="Auto"/>
+								<RowDefinition Height="*"/>
+							</Grid.RowDefinitions>
+
+							<!-- Заголовок панели журнала -->
+							<Border Grid.Row="0"
+									Background="#F5F5F5"
+									CornerRadius="6,6,0,0"
+									Padding="12,8"
+									BorderThickness="0,0,0,1"
+									BorderBrush="#E0E0E0">
+								<TextBlock Text="Журнал расчета"
+										   FontSize="13"
+										   FontWeight="SemiBold"
+										   Foreground="#414042"/>
+							</Border>
+
+							<!-- Таблица журнала расчета -->
+							<DataGrid Grid.Row="1"
+									  AutoGenerateColumns="False"
+									  CanUserResizeColumns="True"
+									  CanUserSortColumns="True"
+									  CanUserReorderColumns="True"
+									  IsReadOnly="True"
+									  Margin="12"
+									  BorderThickness="1"
+									  BorderBrush="#E0E0E0"
+									  ItemsSource="{Binding CalculationLog}"
+									  SelectedItem="{Binding SelectedCalculationLogEntry}"
+									  >
+								<DataGrid.Columns>
+
+									<!-- колонка с цветом бренда банка -->
+									<DataGridTemplateColumn Header="Банк" Width="30">
+										<DataGridTemplateColumn.CellTemplate>
+											<DataTemplate>
+												<Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+													<Ellipse Width="16" Height="16"
+															  Fill="{Binding BankBrandColor}"/>
+												</Grid>
+											</DataTemplate>
+										</DataGridTemplateColumn.CellTemplate>
+									</DataGridTemplateColumn>
+
+
+									<DataGridTextColumn Header="Дата" Binding="{Binding PeriodStartDate, StringFormat=dd.MM.yyyy}" Width="100"/>
+
+									<DataGridTextColumn Header="Период" Width="100">
+										<DataGridTextColumn.Binding>
+											<MultiBinding StringFormat="{}{0} мес.({1} дн.)">
+												<Binding Path="DurationMonths"/>
+												<Binding Path="DurationDays"/>
+											</MultiBinding>
+										</DataGridTextColumn.Binding>
+									</DataGridTextColumn>
+
+									<DataGridTextColumn Header="До" Binding="{Binding PeriodEndDate, StringFormat=dd.MM.yyyy}" Width="100"/>
+									<DataGridTextColumn Header="Сумма" Binding="{Binding DepositAmount, StringFormat=C2}" Width="100"/>
+									<DataGridTextColumn Header="%"	Binding="{Binding DepositInterestRate, StringFormat=0.00}" Width="60"/>
+									<DataGridTextColumn Header="Доход" Binding="{Binding CalculatedIncome, StringFormat=C2}" Width="100"/>
+									<DataGridTextColumn Header="Банк" Binding="{Binding BankName}" Width="150"/>
+									<DataGridTextColumn Header="Комментарий" Binding="{Binding Comment}" Width="150"/>
+								</DataGrid.Columns>
+							</DataGrid>
+						</Grid>
+					</Border>
+
+					<!-- Панель кнопок управления журналом -->
+					<StackPanel Grid.Row="1"
+								Orientation="Horizontal"
+								Spacing="8"
+								Margin="0,12,0,0"
+								HorizontalAlignment="Right">
+
+						<!-- Кнопка удаления выбранной строки -->
+						<Button Content="Удалить строку"
+								Command="{Binding CalculationLogDeleteEntryCommand}"
+								Margin="10,0,10,0"
+								Width="125"
+								BorderBrush="Transparent"
+								BorderThickness="0"
+								CornerRadius="4"
+								HorizontalContentAlignment="Center"
+								VerticalAlignment="Center"
+								Background="#777777"
+								Foreground="White"> <!-- Серый среднего тона (Fluent-удаление) -->
+						</Button>
+
+						<!-- Кнопка очистки всего журнала -->
+						<Button Content="Очистить все"
+								Command="{Binding CalculationLogClearAllCommand}"
+								Margin="0,0,10,0"
+								Width="125"
+								BorderBrush="Transparent"
+								BorderThickness="0"
+								CornerRadius="4"
+								HorizontalContentAlignment="Center"
+								VerticalAlignment="Center"
+								Background="#555555"
+								Foreground="White">   <!-- Тёмный серый (усиленное действие) -->
+						</Button>
+					</StackPanel>
+				</Grid>
+			</TabItem>
+		</TabControl>
+	</Grid>
+</Window>

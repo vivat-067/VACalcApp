@@ -1,0 +1,9 @@
+﻿<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+<!-- Общие -->
+    <x:String x:Key="AppTitle">VA-Calc</x:String>
+    <x:String x:Key="APPDescription">Калькулятор суммы ожидаемого дохода по банковскому депозиту</x:String>
+
+<!-- Экран расчёта -->
+
+</ResourceDictionary>

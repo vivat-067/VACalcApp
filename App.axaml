@@ -1,0 +1,43 @@
+<Application xmlns="https://github.com/avaloniaui"
+			 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+			 xmlns:converters="clr-namespace:VACalcApp.Converters"
+			 xmlns:sys="clr-namespace:System;assembly=System.Runtime"
+			 x:Class="VACalcApp.App"
+			 xmlns:local="using:VACalcApp"
+			 RequestedThemeVariant="Light">
+	<!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
+
+	<Application.DataTemplates>
+		<local:ViewLocator/>
+	</Application.DataTemplates>
+
+	<Application.Resources>
+		<ResourceDictionary>
+
+			<ResourceDictionary.MergedDictionaries>
+				<ResourceInclude Source="avares://VACalcApp/Localization/Strings.ru.axaml"/>				  
+			</ResourceDictionary.MergedDictionaries>
+
+		    <converters:PercentageConverter x:Key="PercentageConverter"/>
+			<converters:InterestCalculationMethodToBoolConverter x:Key="InterestCalculationMethodToBoolConverter"/>
+		    <converters:IncomeAmountConverter x:Key="IncomeAmountConverter"/>
+			<converters:NullableDateTimeConverter x:Key="NullableDateTimeConverter"/>
+	
+		</ResourceDictionary>	
+	</Application.Resources>
+
+
+	<Application.Styles>
+		<FluentTheme DensityStyle="Compact">
+			<FluentTheme.Palettes> <!--Переопределение акцента на зеленый -->
+			<ColorPaletteResources x:Key="Light" Accent="#2E7D32" />
+				<ColorPaletteResources x:Key="Dark" Accent="#2E7D32" />
+			</FluentTheme.Palettes>
+		</FluentTheme>
+
+		<StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml"/>
+
+	</Application.Styles>
+
+
+</Application>
