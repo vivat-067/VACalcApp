@@ -447,5 +447,6 @@ namespace VACalcApp.ViewModels
             _disposables?.Dispose();
 
         }
+
     }
 }
