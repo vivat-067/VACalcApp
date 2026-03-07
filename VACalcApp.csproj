@@ -37,7 +37,7 @@
       <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.3" />
-    <PackageReference Include="ReactiveUI.Avalonia" Version="11.4.3" />
+    <PackageReference Include="ReactiveUI.Avalonia" Version="11.4.7" />
     <PackageReference Include="ReactiveUI.SourceGenerators" Version="2.6.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
