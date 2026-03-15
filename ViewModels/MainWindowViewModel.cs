@@ -86,7 +86,7 @@ namespace VACalcApp.ViewModels
         public partial string StatusIcon { get; set; }
 
         [Reactive]
-        public partial string StatusTitle { get; set;}
+        public partial string StatusTitle { get; set; }
 
         [Reactive]
         public partial string? StatusDescription { get; set; }
@@ -125,12 +125,12 @@ namespace VACalcApp.ViewModels
             _bankAccountInterestCalculator = bankAccountInterestCalculator ?? throw new ArgumentNullException(nameof(bankAccountInterestCalculator));
 
             _bankService = bankService;
-                LoadBanks();        
+            LoadBanks();
 
-            _settingsStorageService = settingsStorageService ?? throw new ArgumentNullException(nameof(settingsStorageService));            
+            _settingsStorageService = settingsStorageService ?? throw new ArgumentNullException(nameof(settingsStorageService));
 
             _currentAppSettings = _settingsStorageService.Load();
-                SettingsToProperties(_currentAppSettings);
+            SettingsToProperties(_currentAppSettings);
 
 
             SubscribeToPropertyChanges();
@@ -154,7 +154,7 @@ namespace VACalcApp.ViewModels
                          .ObserveOn(AvaloniaScheduler.Instance);
 
             CalculateCommand = ReactiveCommand.Create(Calculate,
-                                                  canExecuteCalculateCommand);           
+                                                  canExecuteCalculateCommand);
 
 
 
@@ -166,9 +166,9 @@ namespace VACalcApp.ViewModels
                                                                       {
                                                                           var (count, logentry) = tuple;
                                                                           return count > 0 && logentry != null;
-                                                                       })                        
+                                                                      })
                                                                     .DistinctUntilChanged()
-                                                                    .ObserveOn(AvaloniaScheduler.Instance); 
+                                                                    .ObserveOn(AvaloniaScheduler.Instance);
 
             CalculationLogDeleteEntryCommand = ReactiveCommand.Create(CalculationLogDeleteEntry,
                                                                              CanExecuteCalculationLogDeleteEntryCommand);
@@ -211,12 +211,12 @@ namespace VACalcApp.ViewModels
                 .Throttle(TimeSpan.FromMilliseconds(300))
                 .ObserveOn(AvaloniaScheduler.Instance)
                 .Subscribe(_ => this.CalculatedIncome = decimal.Zero);
-             
+
 
             // Управление отображением статуса
             var statusValidationSubscription = this.WhenAnyValue(x => x.CalculatedIncome)
                 .ObserveOn(AvaloniaScheduler.Instance)
-                .DistinctUntilChanged() 
+                .DistinctUntilChanged()
                 .Subscribe(income =>
                 {
                     var status = income > 0 ? ValidationStatus.Success : ValidationStatus.Ready;
@@ -224,9 +224,9 @@ namespace VACalcApp.ViewModels
                 });
 
 
-            _disposables.Add(calculatedAmountSubscription);           
+            _disposables.Add(calculatedAmountSubscription);
             _disposables.Add(periodSubscription);
-            _disposables.Add(statusValidationSubscription);            
+            _disposables.Add(statusValidationSubscription);
         }
 
         private void SettingsToProperties(AppSettings settings)
@@ -234,7 +234,7 @@ namespace VACalcApp.ViewModels
             if (settings == null) return;
 
             DepositAmount = settings.DepositAmount;
-            DepositInterestRate = settings.DepositInterestRate;            
+            DepositInterestRate = settings.DepositInterestRate;
             DurationMonths = settings.DurationMonths;
             CalculationMethod = settings.CalculationMethod;
 
@@ -259,26 +259,39 @@ namespace VACalcApp.ViewModels
         private void PropertiesToParameters(CalculationParameters parameters)
         {
             parameters.DepositAmount = DepositAmount;
-            parameters.DepositInterestRate = DepositInterestRate;            
+            parameters.DepositInterestRate = DepositInterestRate;
 
             parameters.PeriodStartDate = PeriodStartDate;
             parameters.DurationMonths = DurationMonths;
             parameters.DurationDays = DurationDays;
             parameters.PeriodEndDate = PeriodEndDate;
 
-            parameters.CalculationMethod = CalculationMethod;                      
+            parameters.CalculationMethod = CalculationMethod;
 
         }
 
-        private void UpdatePeriod()        {           
+        private void UpdatePeriod()
+        {
 
             if (CalculationMethod == InterestCalculationMethod.MinimalMonthlyAmount)
             {
                 DurationMonths = 1;
-            };            
+                PeriodEndDate = new(
+                         PeriodStartDate.Year,
+                         PeriodStartDate.Month,
+                         DateTime.DaysInMonth(PeriodStartDate.Year, PeriodStartDate.Month)
+                     );
 
-            PeriodEndDate = PeriodStartDate.AddMonths(DurationMonths);
-            DurationDays = (PeriodEndDate - PeriodStartDate).Days;
+                DurationDays = (PeriodEndDate - PeriodStartDate).Days + 1;
+
+            }
+            else
+            {
+                PeriodEndDate = PeriodStartDate.AddMonths(DurationMonths);
+                DurationDays = (PeriodEndDate - PeriodStartDate).Days;
+
+            }
+
         }
 
 
@@ -309,12 +322,12 @@ namespace VACalcApp.ViewModels
         }
 
 
-        public void SaveSettingsOnWindowClosing() 
-        {  
+        public void SaveSettingsOnWindowClosing()
+        {
             PropertiesToSettings();
             try
             {
-               _settingsStorageService.Save(_currentAppSettings);
+                _settingsStorageService.Save(_currentAppSettings);
             }
             catch (Exception ex)
             {
@@ -330,17 +343,23 @@ namespace VACalcApp.ViewModels
                 Debug.WriteLine($"Rate: {DepositInterestRate}");
                 Debug.WriteLine($"Bank: {SelectedBank}");
                 Debug.WriteLine($"Dep Type: {CalculationMethod}");
-                Debug.WriteLine($"Start: {PeriodStartDate}");                
+                Debug.WriteLine($"Start: {PeriodStartDate}");
 
                 CalculationParameters parameters = new();
                 PropertiesToParameters(parameters);
 
-                CalculatedIncome = _bankAccountInterestCalculator.Calculate(parameters);                
+                if (Validate(parameters))
+                {
 
-                AddCalculationLogEntry(parameters,
-                                       selectedBank: SelectedBank,
-                                       calculatedAmount: CalculatedIncome,
-                                       comment: Comment);
+                    CalculatedIncome = _bankAccountInterestCalculator.Calculate(parameters);
+
+                    AddCalculationLogEntry(parameters,
+                                           selectedBank: SelectedBank,
+                                           calculatedAmount: CalculatedIncome,
+                                           comment: Comment);
+                }
+                else
+                    DisplayValidationStatus(ValidationStatus.Error);
 
                 Console.Beep();
             }
@@ -350,10 +369,14 @@ namespace VACalcApp.ViewModels
             }
         }
 
+        private bool Validate(CalculationParameters parameters)
+        {
+            return parameters.PeriodStartDate >= DateTime.Today;
+        }
 
-        private void AddCalculationLogEntry(CalculationParameters parameters, 
-                                                             Bank selectedBank, 
-                                                             decimal calculatedAmount, 
+        private void AddCalculationLogEntry(CalculationParameters parameters,
+                                                             Bank selectedBank,
+                                                             decimal calculatedAmount,
                                                              string? comment)
         {
             var logEntry = new CalculationLogEntry
@@ -361,7 +384,7 @@ namespace VACalcApp.ViewModels
                 DepositAmount = parameters.DepositAmount,
                 DepositInterestRate = parameters.DepositInterestRate,
                 BankName = selectedBank?.Name ?? string.Empty,
-                BankBrandColor = selectedBank?.BrandColor ?? "#FFFFFF", 
+                BankBrandColor = selectedBank?.BrandColor ?? "#FFFFFF",
                 CalculationMethod = parameters.CalculationMethod,
                 PeriodStartDate = parameters.PeriodStartDate,
                 DurationMonths = parameters.DurationMonths,
@@ -386,13 +409,13 @@ namespace VACalcApp.ViewModels
                     SelectedCalculationLogEntry = null;
 
                 }
-            });            
+            });
         }
 
         private void CalculationLogClearAll()
         {
             AvaloniaScheduler.Instance.Schedule(_ => CalculationLog.Clear());
-        }        
+        }
 
         private async Task ShowAboutAsync()
         {
@@ -410,7 +433,7 @@ namespace VACalcApp.ViewModels
         {
             try
             {
-     
+
                 await ExitAppCloseWindowInteraction.Handle(Unit.Default);
             }
             catch (Exception ex)
@@ -422,7 +445,7 @@ namespace VACalcApp.ViewModels
 
 
         public void DisplayValidationStatus(ValidationStatus status)
-        {            
+        {
             var (title, description, icon) = PrepareValidationStatusRecord(status);
             StatusTitle = title;
             StatusDescription = description;
