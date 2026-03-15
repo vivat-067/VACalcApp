@@ -6,7 +6,7 @@ using VACalcApp.Models;
 namespace VACalcApp.Services
 {
 
-    public enum InterestCalculationMethod {SimpleInterest = 0, CompoundInterestMonthly = 1, MinimalMonthlyAmount = 2}
+    public enum InterestCalculationMethod { SimpleInterest = 0, CompoundInterestMonthly = 1, MinimalMonthlyAmount = 2 }
     public enum ValidationStatus { Ready, Success, Error }
 
     internal class BankAccountInterestCalculator : IBankAccountInterestCalculator
@@ -16,26 +16,25 @@ namespace VACalcApp.Services
 
         public decimal Calculate(CalculationParameters parameters)
         {
-            switch ((InterestCalculationMethod)parameters.CalculationMethod)
+            return parameters.CalculationMethod switch
             {
-                case InterestCalculationMethod.SimpleInterest:                    // Простые проценты
-                case InterestCalculationMethod.MinimalMonthlyAmount:              //Накопительный счет
-                    return CalculateSimpleInterest(parameters);
-                case InterestCalculationMethod.CompoundInterestMonthly:           // Ежемесячная капитализация с выплатой в конце срока
-                    return CalculateCompoundInterest(parameters);
-                default:
-                    throw new ArgumentOutOfRangeException(
-                        nameof(parameters.CalculationMethod),
-                        "Неподдерживаемый вид расчета");
-            }            
+                InterestCalculationMethod.SimpleInterest or
+                InterestCalculationMethod.MinimalMonthlyAmount => CalculateSimpleInterest(parameters),
+                InterestCalculationMethod.CompoundInterestMonthly => CalculateCompoundInterest(parameters),
+                _ => throw new ArgumentOutOfRangeException(
+                                            nameof(parameters.CalculationMethod),
+                                            "Неподдерживаемый вид расчета"),
+            };
         }
 
 
+        // Простые проценты
         private decimal CalculateSimpleInterest(CalculationParameters p)
-        {            
+        {
             return p.DepositAmount * DailyRate(p.DepositInterestRate) * p.DurationDays;
         }
 
+        // Ежемесячная капитализация с выплатой в конце срока
         private decimal CalculateCompoundInterest(CalculationParameters p)
         {
             decimal dailyRate = DailyRate(p.DepositInterestRate);
@@ -49,11 +48,6 @@ namespace VACalcApp.Services
             return amount - p.DepositAmount;
         }
 
-        private decimal CalculateMinimumBalanceInterest(CalculationParameters p)
-        {
-            // минимальный остаток за месяц            
-            return p.DepositAmount * DailyRate(p.DepositInterestRate) * p.DurationDays;
-        }
 
 
     }

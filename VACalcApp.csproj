@@ -8,7 +8,7 @@
   <PropertyGroup Label="Avalonia">
     <EnableAvaloniaXamlCompilation>True</EnableAvaloniaXamlCompilation>
     <AvaloniaUseCompiledBindingsByDefault>False</AvaloniaUseCompiledBindingsByDefault>
-    <AssemblyVersion>2603.01.1600</AssemblyVersion>
+    <AssemblyVersion>2603.15.1033</AssemblyVersion>
     <FileVersion>2026.03.01</FileVersion>
     <ApplicationIcon>Assets\vacalc-logo.ico</ApplicationIcon>
     <PackageIcon>about.png</PackageIcon>

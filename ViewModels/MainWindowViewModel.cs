@@ -153,7 +153,7 @@ namespace VACalcApp.ViewModels
                          .DistinctUntilChanged()
                          .ObserveOn(AvaloniaScheduler.Instance);
 
-            CalculateCommand = ReactiveCommand.CreateFromTask(CalculateAsync,
+            CalculateCommand = ReactiveCommand.Create(Calculate,
                                                   canExecuteCalculateCommand);           
 
 
@@ -322,7 +322,7 @@ namespace VACalcApp.ViewModels
             }
         }
 
-        private async Task CalculateAsync()
+        private void Calculate()
         {
             try
             {
