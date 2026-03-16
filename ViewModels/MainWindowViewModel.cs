@@ -1,4 +1,4 @@
-﻿using DynamicData;
+﻿
 using ReactiveUI;
 using ReactiveUI.Avalonia;
 using ReactiveUI.SourceGenerators;
@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
-using System.Net.NetworkInformation;
+
 using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 
 using VACalcApp.Models;
 using VACalcApp.Services;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+
 
 namespace VACalcApp.ViewModels
 {
@@ -341,7 +341,7 @@ namespace VACalcApp.ViewModels
             {
                 Debug.WriteLine($"Amount: {DepositAmount}");
                 Debug.WriteLine($"Rate: {DepositInterestRate}");
-                Debug.WriteLine($"Bank: {SelectedBank}");
+                Debug.WriteLine($"Bank: {SelectedBank?.Name}");
                 Debug.WriteLine($"Dep Type: {CalculationMethod}");
                 Debug.WriteLine($"Start: {PeriodStartDate}");
 

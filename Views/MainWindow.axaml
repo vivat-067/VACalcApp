@@ -157,6 +157,7 @@
 												   VerticalAlignment="Center"
 												   Margin="0,0,8,0"
 												   Width="100"/>
+
 										<ComboBox Grid.Column="1"
 												  ItemsSource="{Binding Banks}"
 												  SelectedItem="{Binding SelectedBank}"
@@ -164,7 +165,23 @@
 												  PlaceholderText="Выберите банк"
 												  HorizontalAlignment="Stretch"
 												  VerticalAlignment="Center"
-												  FontSize="13"/>
+												  FontSize="13">
+
+											<ComboBox.ItemTemplate>
+												<DataTemplate>
+													<StackPanel Orientation="Horizontal" Margin="2">
+														<Ellipse Width="12" Height="12"
+																 Fill="{Binding BrandColor}"
+																 VerticalAlignment="Center"/>
+														<TextBlock Text="{Binding Name}"
+																   VerticalAlignment="Center"
+																   Margin="8,0,0,0"/>
+													</StackPanel>
+												</DataTemplate>
+											</ComboBox.ItemTemplate>
+
+										</ComboBox>
+
 									</Grid>
 								</Grid>
 							</StackPanel>
@@ -274,7 +291,7 @@
 												   Margin="0,0,0,0"
 												   Width="110"/>
 										<CalendarDatePicker Grid.Column="1"
-															SelectedDate="{Binding PeriodStartDate}"														
+															SelectedDate="{Binding PeriodStartDate}"
 															VerticalAlignment="Center"
 															HorizontalAlignment="Stretch"
 															FontSize="13"/>
@@ -462,14 +479,14 @@
 												   TextTrimming="CharacterEllipsis"
 												   Width="250"
 												   HorizontalAlignment="Stretch"
-												   VerticalAlignment="Center" 
+												   VerticalAlignment="Center"
 												   ToolTip.Tip="{Binding StatusDescription}">
 
 											<Run Text="{Binding StatusTitle}"/>          <!-- Заголовок статуса -->
 											<Run Foreground="#7F8C8D"
 												 FontWeight="Normal"
 												 Text="{Binding StatusDescription}"/>   <!-- Описание статуса -->
-												 
+
 
 										</TextBlock>
 
@@ -597,7 +614,7 @@
 											<DataTemplate>
 												<Grid HorizontalAlignment="Center" VerticalAlignment="Center">
 													<Ellipse Width="16" Height="16"
-															  Fill="{Binding BankBrandColor}"/>
+															 Fill="{Binding BankBrandColor}"/>
 												</Grid>
 											</DataTemplate>
 										</DataGridTemplateColumn.CellTemplate>
