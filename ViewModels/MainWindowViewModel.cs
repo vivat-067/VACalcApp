@@ -444,11 +444,11 @@ namespace VACalcApp.ViewModels
 
 
 
-        public void DisplayValidationStatus(ValidationStatus status)
+        public void DisplayValidationStatus(ValidationStatus status, string? customDescription = null)
         {
             var (title, description, icon) = PrepareValidationStatusRecord(status);
             StatusTitle = title;
-            StatusDescription = description;
+            StatusDescription = customDescription ?? description;
             StatusIcon = icon;
         }
 

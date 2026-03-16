@@ -462,12 +462,14 @@
 												   TextTrimming="CharacterEllipsis"
 												   Width="250"
 												   HorizontalAlignment="Stretch"
-												   VerticalAlignment="Center" >
+												   VerticalAlignment="Center" 
+												   ToolTip.Tip="{Binding StatusDescription}">
 
 											<Run Text="{Binding StatusTitle}"/>          <!-- Заголовок статуса -->
 											<Run Foreground="#7F8C8D"
 												 FontWeight="Normal"
 												 Text="{Binding StatusDescription}"/>   <!-- Описание статуса -->
+												 
 
 										</TextBlock>
 
