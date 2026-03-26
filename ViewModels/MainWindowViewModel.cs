@@ -1,4 +1,7 @@
 ﻿
+using Avalonia.Media;
+using Avalonia.Platform;
+
 using ReactiveUI;
 using ReactiveUI.Avalonia;
 using ReactiveUI.SourceGenerators;
@@ -8,13 +11,12 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
-
 using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
-
+using VACalcApp.Helpers;
 using VACalcApp.Models;
 using VACalcApp.Services;
 
@@ -83,7 +85,7 @@ namespace VACalcApp.ViewModels
         //Validation Status 
 
         [Reactive]
-        public partial string StatusIcon { get; set; }
+        public partial IImage? StatusIcon { get; set; }
 
         [Reactive]
         public partial string StatusTitle { get; set; }
@@ -452,14 +454,14 @@ namespace VACalcApp.ViewModels
             StatusIcon = icon;
         }
 
-
-        private (string title, string description, string icon) PrepareValidationStatusRecord(ValidationStatus status) => status switch
+        private (string title, string description, IImage? icon) PrepareValidationStatusRecord(ValidationStatus status) => status switch
         {
-            ValidationStatus.Ready => ("Введите данные. ", "Нажмите на кнопку \"Рассчитать\"", "/Assets/info.png"),
-            ValidationStatus.Success => ("Успешно. ", "Раcчет выполнен", "/Assets/info.png"),
-            ValidationStatus.Error => ("Ошибка! ", "Проверьте ввод данных...", "/Assets/warning.png"),
-            _ => throw new ArgumentOutOfRangeException(nameof(status), $"Неизвестный статус валидации: {status}"),
+            ValidationStatus.Ready => ("Введите данные.", "Нажмите кнопку", SvgHelper.LoadFromAssets("Assets/info.svg")),
+            ValidationStatus.Success => ("Успешно.", "Расчёт выполнен", SvgHelper.LoadFromAssets("Assets/success.svg")),
+            ValidationStatus.Error => ("Ошибка!", "Проверьте ввод", SvgHelper.LoadFromAssets("Assets/warning.svg")),
+            _ => throw new ArgumentOutOfRangeException(nameof(status), status, null)
         };
+        
 
 
         /// <summary>
